@@ -1,0 +1,74 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: albef_glue
+  model_type: mnli
+  load_finetuned: False
+  pretrained: "./lavis/output/ALBEF/Pretrain/20230303154_itm_itc_mlm_logits_att_hid/checkpoint_2.pth" # exp-B
+  num_classes: 2
+  fusion_layer: 6
+  num_layers: 6
+datasets:
+  cola: # name of the dataset builder
+    vis_processor:
+        train:
+          name: "blip_image_train"
+        eval:
+          name: "blip_image_eval"
+    text_processor:
+        train:
+          name: "blip_caption"
+          max_words: 128
+        eval:
+          name: "blip_caption"
+          max_words: 128
+
+run:
+  task: multimodal_classification
+  # optimization-specific
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 1e-5
+  min_lr: 0
+  weight_decay: 0.1
+  max_epoch: 15
+  batch_size_train: 32
+  batch_size_eval: 64
+  num_workers: 4
+
+  log_freq: 200
+  seed: 42
+  output_dir: "output/ALBEF/CoLA"
+
+  amp: False
+  init_scale: 65536
+  growth_interval: 2000
+  resume_ckpt_path: null
+
+  evaluate: False 
+  train_splits: ["txt_train"]
+  valid_splits: ["val"]
+  test_splits: ["test"]
+
+  # distribution-specific
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: False
+
+
+#'''
+#cola, mrpc, rte: lr{1e-5, 2e-5}, batch_size{16, 32}, max_epochs{10, 5, 15}
+#stsb: lr{2e-5}, batch_size{16, 32}, max_epochs{10}
+#qqp: lr{2e-5}, batch_size{32}, max_epochs{10}
+#qnli, sst2: : lr{1e-5}, batch_size{32}, max_epochs{10}
+#mnli: lr{1e-5, 1.5e-5}, batch_size{32}, max_epochs{10}
+#'''
+#'''
+#minilmv2
+#tinybert
+#'''
+#multi obj conflict
+

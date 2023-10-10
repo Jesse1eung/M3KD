@@ -1,0 +1,79 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: mix_retrieval
+  model_type: coco
+  load_finetuned: False
+  finetuned: None
+  pretrained: "./lavis/output/MixMoME/Distill/20230123094_mlm_itm_moco_logits/checkpoint_27.pth"
+#  pretrained: "/scratch/nlp/gzhch/pretrained_ckpt/g_distill/ckpt_17_r7bs128.pth"
+  teacher_ckpt: "./pretrained_ckpt/vilt-b32-mlm"
+  student_config_path: "configs/models/mix/config_student.json"
+
+  queue_size: 65500
+  add_itc: False
+  add_itm: True
+  use_moco: True
+
+  patch_size: 16
+  fusion_layer: 5
+  share_layer: 3
+  num_hidden_layers: 6
+  image_size: 384
+
+datasets:
+  coco_retrieval: # name of the dataset builder
+    vis_processor:
+        train:
+          name: "blip_image_train"
+          image_size: 384
+        eval:
+          name: "blip_image_train"
+          image_size: 384
+    text_processor:
+        train:
+          name: "blip_caption"
+        eval:
+          name: "blip_caption"
+
+run:
+  task: retrieval
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 5.3e-5 #1e-5
+  min_lr: 1.77e-5
+  weight_decay: 0.01 #0.05
+  max_epoch: 10 #5
+
+  # dataloading
+  num_workers: 4
+  batch_size_train: 100
+  batch_size_eval: 64
+  accum_grad_iters: 1
+
+  train_splits: ["train"]
+  valid_splits: ["val"]
+  test_splits: ["test"]
+
+  # distribution
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: False
+  use_dist_eval_sampler: False
+
+#   model specific
+  k_test: 256
+
+  # misc
+  seed: 42
+  output_dir: "output/MixMoME/Retrieval_COCO"
+
+  amp: True
+#  resume_ckpt_path: "./lavis/output/MixMoME/Retrieval_COCO/20230124095_itm_moco/checkpoint_best.pth" #null
+  resume_ckpt_path: null #null
+
+  evaluate: False

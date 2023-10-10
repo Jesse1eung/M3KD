@@ -1,0 +1,32 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: mix_distill
+
+  load_finetuned: False
+#  pretrained: "https://storage.googleapis.com/sfr-pcl-data-research/ALBEF/ALBEF.pth"
+#  finetuned: "./lavis/output/MixMoME/Distill/20230103204_mlm_itm_itc_logits/checkpoint_5.pth"
+
+  # bert config
+  med_config_path: "configs/models/med_config_mix.json"
+  mlm_mask_prob: 0.15
+
+  embed_dim: 256
+  momentum: 0.995
+  alpha: 0.4
+  temp: 0.07
+
+  max_txt_len: 30
+
+
+preprocess:
+    vis_processor:
+        train:
+          name: "vilt_image_train"
+          image_size: 256
+    text_processor:
+        train:
+          name: "blip_caption"

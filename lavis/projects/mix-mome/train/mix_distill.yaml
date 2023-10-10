@@ -1,0 +1,110 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+
+# conceptual_caption_12m: # name of the dataset builder
+#   vis_processor:
+#       train:
+#         name: "blip_image_train"
+#         image_size: 256
+#   text_processor:
+#       train:
+#         name: "blip_caption"
+
+datasets:
+ conceptual_caption_3m: # name of the dataset builder
+   vis_processor:
+     train:
+       name: "blip_image_train"
+       image_size: 224
+       min_scale: 0.2
+   text_processor:
+     train:
+       name: "blip_caption"
+ coco_caption:
+   vis_processor:
+     train:
+       name: "blip_image_train"
+       image_size: 224
+       min_scale: 0.2
+   text_processor:
+     train:
+       name: "blip_caption"
+ vg_caption: # name of the dataset builder
+   vis_processor:
+     train:
+       name: "blip_image_train"
+       image_size: 224
+       min_scale: 0.2
+   text_processor:
+     train:
+       name: "blip_caption"
+ sbu_caption: # name of the dataset builder
+   vis_processor:
+     train:
+       name: "blip_image_train"
+       image_size: 224
+       min_scale: 0.2
+   text_processor:
+     train:
+       name: "blip_caption"
+
+
+model:
+  arch: mix_distill
+
+  model_type: distill
+  load_pretrained: False
+  teacher_ckpt: "./pretrained_ckpt/vilt-b32-mlm"
+  student_config_path: "configs/models/mix/config_student.json"
+  beit_ckpt: "./pretrained_ckpt/beit/pytorch_model.bin"
+  xvlm_ckpt: "../pretrained_ckpt/xvlm/4m_base_model_state_step_199999.th"
+  queue_size: 65536
+
+  add_itm: True
+  add_itc: False
+  add_mlm: True
+  add_logits: True
+  use_moco: True
+
+  image_size: 224
+  fusion_layer: 5
+  share_layer: 3
+  num_hidden_layers: 6
+  load_beit_by_sep: True
+
+run:
+  task: image_text_pretrain
+  # optimizer
+  lr_sched: "linear_warmup_step_lr"
+  # lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 3e-4
+  min_lr: 1e-6
+  warmup_lr: 1e-6
+  lr_decay_rate: 0.9
+
+  weight_decay: 0.05
+  max_epoch: 41
+  batch_size_train: 256
+  batch_size_eval: 64
+  accum_grad_iters: 1
+  num_workers: 1
+  warmup_steps: 3000
+
+  seed: 42
+
+  output_dir: "output/MixMoME/Distill"
+
+  amp: True
+#  resume_ckpt_path: null # null
+  resume_ckpt_path: "./lavis/output/MixMoME/Distill/20230123094_mlm_itm_moco_logits/checkpoint_27.pth" # null
+
+  evaluate: False
+  train_splits: ["train"]
+
+  device: "cuda"
+  world_size: 2
+  dist_url: "env://"
+  distributed: True

@@ -1,0 +1,60 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: albef_imagenet
+  model_type: imagenet
+  pretrained: "/scratch/nlp/gzhch/pretrained_ckpt/albef/ALBEF_4M.pth"
+  num_classes: 1000
+  image_size: 384
+
+datasets:
+  imagenet: # name of the dataset builder
+    build_info:
+      # Be careful not to append minus sign (-) before split to avoid itemizing
+      splits: [ "img_train", "val" ]
+      images:
+        storage: vision/imagenet/
+    vis_processor:
+        train:
+          name: "blip_image_train"
+          image_size: 384
+        eval:
+          name: "blip_image_eval"
+          image_size: 384
+#          image_size: 336
+
+run:
+  task: multimodal_classification
+
+  # dataloading
+  lr_sched: "linear_warmup_cosine_lr"
+  max_epoch: 300
+  init_lr: 1e-3
+  min_lr: 1e-5
+  warmup_lr: 1e-6
+  weight_decay: 0.03
+  num_workers: 4
+  batch_size_train: 32
+  batch_size_eval: 128
+  warmup_steps: 3000
+
+  train_splits: ["img_train"]
+  valid_splits: ["val"]
+  test_splits: ["val"]
+
+  # distribution
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+
+  # misc
+  seed: 42
+  output_dir: "output/albef/ft_imnet"
+
+  init_scale: 65536
+  growth_interval: 2000
+  evaluate: False
