@@ -1,1 +1,1 @@
-Here are all the testing codes related to the project. The corresponding test model weights can be obtained here: [model ckpt](https://pan.baidu.com/s/1m9FWCx1vhxmEGxS_AUtB3Q), password: k8cn
+In this repository, we release our lightweight language understanding models and cross-modal language model as basic tools, providing our [model checkpoints](https://pan.baidu.com/s/1m9FWCx1vhxmEGxS_AUtB3Q) (passwd: k8cn) and inference code.
