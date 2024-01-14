@@ -1,0 +1,1 @@
+Our model combines advanced knowledge distillation and data augmentation methods, and specifically enhances robustness to dynamic token pruning during inference in training. We release our models on the [GLUE](https://arxiv.org/pdf/1804.07461) tasks and provided the inference code implemented mainly based on [LAT](https://github.com/clovaai/length-adaptive-transformer).
